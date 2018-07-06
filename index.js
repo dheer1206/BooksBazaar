@@ -4,16 +4,29 @@ const crypto = require('crypto') ;
 const app = express()
 const mysql = require('mysql2');
 var jwt = require('jsonwebtoken');
+var multer = require('multer');
+var path = require('path')
+
+var storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, './public/assets/images/listings/')
+    },
+    filename: function (req, file, cb) {
+      cb(null, Date.now().toString() + '-' + file.originalname) 
+    }
+  })
+   
+var upload = multer({ storage: storage }) ;
 
 // create the connection to database
 const connection = mysql.createConnection({
-    host: 'sql12.freemysqlhosting.net',
-    user: 'sql12245265',
-    password : 'upsLUJk7Bh' ,
-    database : 'sql12245265' ,
+    host: 'localhost',
+    user: 'root',
+    password : 'password' ,
+    database : 'finalproject' ,
     multipleStatements: true 
   });
-
+  
 app.use( express.static('public') ) ;  
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}) );
@@ -47,10 +60,10 @@ app.post("/api/register" , function(req,res) {
             if (err) {
                 console.log( "Error " + err ) ;
             }
+            console.log("Query Done") ;
         }
      ) ;
 }) ;
-
 
 
 app.post('/api/login', function (req, res) {
@@ -116,13 +129,14 @@ app.post('/api/verifyToken', function (req, res) {
 }) ;
 
 app.post('/api/addListingToWishlist' , function(req,res) {
-
+    
     connection.query( 
         `insert into wishlist ( user_id , listing_id ) values (?,?) `, [req.body.user_id , req.body.listing_id] ,
         function( err , results , fields ) {
             if (err) {
                 console.log("Error " + err) ;
             }
+            res.json("Done") ;
         }
      ) ;    
 
@@ -130,7 +144,6 @@ app.post('/api/addListingToWishlist' , function(req,res) {
 
 app.post('/api/fetchWishlist' , function(req,res){
     
-
     connection.query( 
         `select * from listings inner join wishlist on listings.listing_id=wishlist.listing_id where user_id = ? ; `, [req.body.user_id] ,
         function( err , results , fields ) {
@@ -143,6 +156,57 @@ app.post('/api/fetchWishlist' , function(req,res){
 
 }) ;
 
+app.post('/api/fetchMyListings', function(req,res) {
+    connection.query( 
+        `select * from listings where seller = ? ; `, [req.body.user_id] ,
+        function( err , results , fields ) {
+            if (err) {
+                console.log("Error " + err) ;
+            }
+            res.json( results ) ;
+        }
+     ) ;    
+}) ;
+
+
+
+app.post('/api/uploadImage' , upload.single('avatar'), function(req,res) {
+    connection.query( 
+        `insert into listings ( seller , book_name , book_author , price , book_condition , image , other_details) values ( ? , ? , ? , ? ,? , ?, ? ) ;` ,
+        [ req.body.seller , req.body.book_name , req.body.book_author , req.body.price , req.body.book_condition, req.file.path.split("\\")[4], req.body.other_details ],
+        function( err , results , fields ) {
+            if (err) {
+                console.log("Error " + err) ;
+            }
+            res.json(results) ;
+        } ) ;
+}) ;
+
+app.post('/api/removefromMyListings' , function(req,res) {
+    connection.query( 
+        `delete from listings where listing_id = ? ; `, [req.body.listing_id] ,
+        function( err , results , fields ) {
+            if (err) {
+                console.log("Error " + err) ;
+            }
+            res.json( "DOne" ) ;
+        }
+     ) ;    
+})
+
+app.post('/api/fetchListing', function(req,res) {
+    connection.query( 
+        `select * from listings where listing_id = ? ; `, [req.body.listing_id] ,
+        function( err , results , fields ) {
+            if (err) {
+                console.log("Error " + err) ;
+                res.json("Error") ;
+            }
+            res.json( results[0] ) ;
+        }
+     ) ;    
+}) ;
+
 app.post('/api/removefromWishlist' , function(req,res){
     
 
@@ -152,7 +216,7 @@ app.post('/api/removefromWishlist' , function(req,res){
             if (err) {
                 console.log("Error " + err) ;
             }
-            
+            res.json("Done") ;
         }
      ) ;    
 
@@ -192,9 +256,8 @@ app.post('/api/verifyEmail', function(req,res) {
 }) ;
 
 
-let port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080
-let ip   = process.env.IP   || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0'
 
-app.listen(port, ip, function () {
+
+app.listen(3000, function () {
   console.log('Example app listening on port 3000!')
 }) 
