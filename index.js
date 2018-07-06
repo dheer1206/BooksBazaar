@@ -256,8 +256,10 @@ app.post('/api/verifyEmail', function(req,res) {
 }) ;
 
 
+let port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080
+let ip   = process.env.IP   || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0'
 
-
-app.listen(3000, function () {
+app.listen(port , ip , function () {
+    console.log("Express server listening on port %d in %s mode", port , ip);
   console.log('Example app listening on port 3000!')
 }) 
