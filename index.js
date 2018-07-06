@@ -171,6 +171,7 @@ app.post('/api/fetchMyListings', function(req,res) {
 
 
 app.post('/api/uploadImage' , upload.single('avatar'), function(req,res) {
+    console.log("Inside image upload")
     connection.query( 
         `insert into listings ( seller , book_name , book_author , price , book_condition , image , other_details) values ( ? , ? , ? , ? ,? , ?, ? ) ;` ,
         [ req.body.seller , req.body.book_name , req.body.book_author , req.body.price , req.body.book_condition, req.file.path.split("\\")[4], req.body.other_details ],
@@ -178,6 +179,7 @@ app.post('/api/uploadImage' , upload.single('avatar'), function(req,res) {
             if (err) {
                 console.log("Error " + err) ;
             }
+            console.log(results) ;
             res.json(results) ;
         } ) ;
 }) ;
