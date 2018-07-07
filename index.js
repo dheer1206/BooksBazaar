@@ -6,7 +6,7 @@ const mysql = require('mysql2');
 var jwt = require('jsonwebtoken');
 var multer = require('multer');
 var path = require('path')
-var cloudinary = require('cloudinary');
+var cloudinary = require('cloudinary') ;
 
 app.use( express.static('public') ) ;  
 app.use(bodyParser.json());
@@ -185,6 +185,7 @@ app.post('/api/fetchMyListings', function(req,res) {
 app.post('/api/uploadImage' , upload.single('avatar'), function(req,res) {
     
     cloudinary.uploader.upload(req.file.path, function(result) { 
+        console.log(result) ;
         connection.query( 
             `insert into listings ( seller , book_name , book_author , price , book_condition , image , other_details) values ( ? , ? , ? , ? ,? , ?, ? ) ;` ,
             [ req.body.seller , req.body.book_name , req.body.book_author , req.body.price , req.body.book_condition, result.url, req.body.other_details ],
