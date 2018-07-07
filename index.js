@@ -275,7 +275,7 @@ app.post('/api/verifyEmail', function(req,res) {
 }) ;
 
 
-let port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080
+let port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 3000
 let ip   = process.env.IP   || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0'
 
 app.listen(port , ip , function () {
