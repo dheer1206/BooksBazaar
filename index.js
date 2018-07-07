@@ -6,6 +6,41 @@ const mysql = require('mysql2');
 var jwt = require('jsonwebtoken');
 var multer = require('multer');
 var path = require('path')
+var B2 = require('backblaze-b2');
+var fs = require('fs') ;
+
+app.use( express.static('public') ) ;  
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}) );
+ 
+var b2 = new B2({
+  accountId: 'f3ad45a0a8cb',
+  applicationKey: '00281d94a69ec8c3e3f048f6aca1cfe7350f97d5dd'
+});
+ 
+async function GetBuckets(file) {
+  try {
+    await b2.authorize();
+    var response = await b2.getUploadUrl('7f13eacdf4557a106a480c1b'); 
+    console.log(response.data)
+    var response2 = await b2.uploadFile({
+        uploadUrl: response.data.uploadUrl,
+        uploadAuthToken: response.data.authorizationToken ,
+        filename: file.originalname,
+        mime: file.mimetype, // optional mime type, will default to 'b2/x-auto' if not provided
+        data: fs.readFileSync(file.destination + file.filename), // this is expecting a Buffer, not an encoded string
+        // optional data hash, will use sha1(data) if not provided
+        
+    });  // returns promise
+    console.log(response2.data)
+    
+    
+
+  } catch (e){
+    console.log('Error getting buckets:', e)
+  }
+}
+
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -27,9 +62,7 @@ const connection = mysql.createConnection({
     multipleStatements: true 
   });
   
-app.use( express.static('public') ) ;  
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}) );
+
 
 app.all("/*", function(req, res, next){
   res.header('Access-Control-Allow-Origin', '*');
@@ -171,7 +204,10 @@ app.post('/api/fetchMyListings', function(req,res) {
 
 
 app.post('/api/uploadImage' , upload.single('avatar'), function(req,res) {
-    console.log("Inside image upload")
+    console.log("Inside image upload") ;
+console.log(req.file) ;
+   GetBuckets(req.file) ;
+
     connection.query( 
         `insert into listings ( seller , book_name , book_author , price , book_condition , image , other_details) values ( ? , ? , ? , ? ,? , ?, ? ) ;` ,
         [ req.body.seller , req.body.book_name , req.body.book_author , req.body.price , req.body.book_condition, req.file.path.split("\\")[4], req.body.other_details ],
