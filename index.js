@@ -274,6 +274,33 @@ app.post('/api/verifyEmail', function(req,res) {
 
 }) ;
 
+app.post('/api/sendmessage' , function(req,res) {
+    connection.query( 
+        `insert into messages (from_user , to_user , message , seen) values( ? , ? , ? , ? ) ; `,
+         [ req.body.from_user , req.body.to_user , req.body.message , 'unseen' ] ,
+        function( err , results , fields ) {
+            if (err) {
+                console.log("Error " + err ) ;
+            }
+            res.json(results) ;
+        }
+     ) ;
+}) ;
+
+app.post('/api/getmessage' , function(req,res) {
+    connection.query( 
+        `select * from messages where from_user = ? or to_user = ? ;`,
+         [ req.body.username , req.body.username ] ,
+        function( err , results , fields ) {
+            if (err) {
+                console.log("Error " + err ) ;
+            }
+            console.log(results) ;
+            res.json(results) ;
+        }
+     ) ;
+}) ;
+
 app.get('*', function(req, res) {
     res.sendfile('./public/index.html')
   }) ;
