@@ -92,6 +92,9 @@ app.post('/api/login', function (req, res) {
     connection.query( 
         `select * from users where user_id = ?`, [req.body.username] ,
         function( err , results , fields ) {
+            if (err) {
+                console.log("Error" + err) ;
+            }
             if (results.length === 0) {
                 res.json({
                     statusCode : 500 ,
