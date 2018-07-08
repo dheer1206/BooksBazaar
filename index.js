@@ -7,6 +7,8 @@ var jwt = require('jsonwebtoken');
 var multer = require('multer');
 var path = require('path')
 var cloudinary = require('cloudinary') ;
+var http = require('http').Server(app);
+var io = require('socket.io')(http);
 
 app.use( express.static('public') ) ;  
 app.use(bodyParser.json());
@@ -19,7 +21,14 @@ cloudinary.config({
     api_secret: 's7Wfgr1qhdEPKW7DF8bcpQ_u2Vs' 
   });
   
-
+io.on('connection', function(socket){
+    console.log('a user connected');
+    socket.on('new-message', (message) => {
+        console.log(message);
+        io.emit('new-message', message);
+      });
+});
+  
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -295,7 +304,7 @@ app.post('/api/getmessage' , function(req,res) {
             if (err) {
                 console.log("Error " + err ) ;
             }
-            console.log(results) ;
+            //console.log(results) ;
             res.json(results) ;
         }
      ) ;
@@ -308,7 +317,7 @@ app.get('*', function(req, res) {
 let port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 3000
 let ip   = process.env.IP   || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0'
 
-app.listen(port , ip , function () {
+http.listen(port , ip , function () {
     console.log("Express server listening on port %d in %s mode", port , ip);
   console.log('Example app listening on port 3000!')
 }) 
