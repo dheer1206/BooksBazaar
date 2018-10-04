@@ -314,7 +314,7 @@ app.post('/api/getmessage' , function(req,res) {
 }) ;
 
 app.get('*', function(req, res) {
-    res.sendFile('./public/index.html')
+    res.sendfile('./public/index.html')
   }) ;
 
 let port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 3000
