@@ -44,9 +44,9 @@ var upload = multer({ storage: storage }) ;
 // create the connection to database
 const connection = mysql.createConnection({
     host: 'sql12.freemysqlhosting.net',
-    user: 'sql12245265',
-    password : 'upsLUJk7Bh' ,
-    database : 'sql12245265' ,
+    user: 'sql12259753',
+    password : '5yuq6Dt8Se' ,
+    database : 'sql12259753' ,
     multipleStatements: true 
   });
   
@@ -314,7 +314,7 @@ app.post('/api/getmessage' , function(req,res) {
 }) ;
 
 app.get('*', function(req, res) {
-    res.sendfile('./public/index.html')
+    res.sendFile('./public/index.html')
   }) ;
 
 let port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 3000
