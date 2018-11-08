@@ -44,9 +44,9 @@ var upload = multer({ storage: storage }) ;
 // create the connection to database
 const connection = mysql.createConnection({
     host: 'sql12.freemysqlhosting.net',
-    user: 'sql12259753',
-    password : '5yuq6Dt8Se' ,
-    database : 'sql12259753' ,
+    user: 'sql12264608',
+    password : 'D2qEl9Vx68' ,
+    database : 'sql12264608' ,
     multipleStatements: true 
   });
   
